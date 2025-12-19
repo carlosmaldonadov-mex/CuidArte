@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CuidArte | Calendario de guardias</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="hero">
+    <div class="hero__brand">
+      <img src="assets/cuidarte-logo.svg" alt="Logotipo de CuidArte" class="hero__logo" />
+      <div>
+        <p class="eyebrow">Plataforma de guardias</p>
+        <h1>Control inteligente de enfermeros, pacientes y guardias</h1>
+        <p class="lead">Agenda turnos matutinos, vespertinos y nocturnos sin conflictos, calcula cobros y pagos semanales y mantén un historial limpio con bajas sin perder datos.</p>
+      </div>
+    </div>
+    <div class="hero__pills">
+      <span class="pill">Responsivo</span>
+      <span class="pill">Calendario Domingo a Sábado</span>
+      <span class="pill">Cobros y pagos semanales</span>
+      <span class="pill">Bajas sin borrar historial</span>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="card">
+      <div class="section-header">
+        <div>
+          <p class="eyebrow">Registro rápido</p>
+          <h2>Enfermeros y Pacientes</h2>
+          <p>Da de alta o baja a enfermeros y pacientes. Las bajas son lógicas: conservan historial y cobros.</p>
+        </div>
+      </div>
+      <div class="grid two-cols gap-lg">
+        <form id="nurse-form" class="form">
+          <h3>Nuevo enfermero</h3>
+          <label>Nombre
+            <input type="text" name="name" placeholder="Ej. Alejandra Vidal" required />
+          </label>
+          <label>Contacto (opcional)
+            <input type="text" name="contact" placeholder="Teléfono, email o nota" />
+          </label>
+          <button type="submit" class="btn primary">Registrar enfermero</button>
+        </form>
+
+        <form id="patient-form" class="form">
+          <h3>Nuevo paciente</h3>
+          <label>Nombre
+            <input type="text" name="name" placeholder="Ej. Diego Méndez" required />
+          </label>
+          <div class="grid three-cols gap-sm">
+            <label>Tarifa matutina
+              <input type="number" name="morningRate" min="0" step="50" value="900" required />
+            </label>
+            <label>Tarifa vespertina
+              <input type="number" name="afternoonRate" min="0" step="50" value="950" required />
+            </label>
+            <label>Tarifa nocturna
+              <input type="number" name="nightRate" min="0" step="50" value="1100" required />
+            </label>
+          </div>
+          <label>% pago al enfermero
+            <input type="number" name="nurseShare" min="0" max="100" step="1" value="65" required />
+          </label>
+          <button type="submit" class="btn primary">Registrar paciente</button>
+        </form>
+      </div>
+
+      <div class="entity-lists">
+        <div>
+          <div class="list-header">
+            <h3>Enfermeros</h3>
+            <span class="tag" id="nurse-count">0 activos</span>
+          </div>
+          <ul id="nurse-list" class="list"></ul>
+        </div>
+        <div>
+          <div class="list-header">
+            <h3>Pacientes</h3>
+            <span class="tag" id="patient-count">0 activos</span>
+          </div>
+          <ul id="patient-list" class="list"></ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="section-header">
+        <div>
+          <p class="eyebrow">Asignación controlada</p>
+          <h2>Programar guardias</h2>
+          <p>El sistema valida automáticamente que un enfermero no tenga más de una guardia por turno y que un paciente solo tenga un enfermero por guardia en la fecha elegida.</p>
+        </div>
+        <div class="hint">Turnos permitidos por fecha: matutino, vespertino y nocturno.</div>
+      </div>
+      <form id="guard-form" class="form grid four-cols gap-sm">
+        <label>Paciente
+          <select name="patientId" required></select>
+        </label>
+        <label>Enfermero
+          <select name="nurseId" required></select>
+        </label>
+        <label>Fecha
+          <input type="date" name="date" required />
+        </label>
+        <label>Turno
+          <select name="shift" required>
+            <option value="morning">Matutino</option>
+            <option value="afternoon">Vespertino</option>
+            <option value="night">Nocturno</option>
+          </select>
+        </label>
+        <div class="full-row">
+          <button type="submit" class="btn primary">Asignar guardia</button>
+          <p id="guard-message" class="inline-hint" aria-live="polite"></p>
+        </div>
+      </form>
+    </section>
+
+    <section class="card">
+      <div class="section-header">
+        <div>
+          <p class="eyebrow">Calendario Domingo a Sábado</p>
+          <h2>Agenda visual por paciente o enfermero</h2>
+          <p>Selecciona la semana y el enfoque para revisar disponibilidad o confirmar asignaciones.</p>
+        </div>
+        <div class="controls">
+          <label class="radio"><input type="radio" name="view-mode" value="patient" checked /> Ver por paciente</label>
+          <label class="radio"><input type="radio" name="view-mode" value="nurse" /> Ver por enfermero</label>
+        </div>
+      </div>
+      <div class="grid three-cols gap-sm align-center">
+        <label>Elegir
+          <select id="calendar-entity"></select>
+        </label>
+        <label>Fecha de referencia
+          <input type="date" id="calendar-week" />
+        </label>
+        <div class="week-actions">
+          <button type="button" class="btn ghost" id="prev-week">◀ Semana previa</button>
+          <button type="button" class="btn ghost" id="next-week">Semana siguiente ▶</button>
+        </div>
+      </div>
+      <div id="calendar" class="calendar" role="table" aria-label="Calendario semanal"></div>
+    </section>
+
+    <section class="card">
+      <div class="section-header">
+        <div>
+          <p class="eyebrow">Cobros y pagos</p>
+          <h2>Resumen financiero semanal</h2>
+          <p>Calcula cobros por paciente y pagos a enfermeros por semana. Las tarifas se toman por turno y el porcentaje para el enfermero se define por paciente.</p>
+        </div>
+        <label class="inline">Semana a consultar
+          <input type="date" id="finance-week" />
+        </label>
+      </div>
+      <div class="grid two-cols gap-lg">
+        <div>
+          <h3>Pacientes · Cobros</h3>
+          <div id="patient-finances" class="finance-list"></div>
+        </div>
+        <div>
+          <h3>Enfermeros · Pagos</h3>
+          <div id="nurse-finances" class="finance-list"></div>
+        </div>
+      </div>
+      <div class="totals">
+        <div class="total-card">
+          <p class="label">Cobros totales semana</p>
+          <p class="value" id="total-charges">$0</p>
+        </div>
+        <div class="total-card">
+          <p class="label">Pagos totales semana</p>
+          <p class="value" id="total-payouts">$0</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div>
+      <h4>CuidArte</h4>
+      <p>Calendario de guardias con validaciones por turno, resumen de cobros y pagos, y mejoras futuras sin perder historial.</p>
+    </div>
+    <div class="footer__links">
+      <span class="pill">Turnos: matutino · vespertino · nocturno</span>
+      <span class="pill">Domingo a sábado</span>
+      <span class="pill">Historial preservado</span>
+    </div>
+  </footer>
+
+  <script src="app.js" type="module"></script>
+</body>
+</html>
